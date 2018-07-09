@@ -27,6 +27,8 @@ class Chromosome(list):
         gene = self[nth]
         if gene != -1:
             x = gene // timeslots_num
+            if x >= len(list(classprof_time.keys())):
+                print(gene, x, len(list(classprof_time.keys())))
             return list(classprof_time.keys())[x].split('-')[0]
 
     def get_gene_class(self, nth):
@@ -49,8 +51,10 @@ class Chromosome(list):
                 pt[self.get_gene_prof(i)].append(self[i] % timeslots_num)
                 ct[self.get_gene_class(i)].append(self[i] % timeslots_num)
             if i < self.size / 2:
-                if course_value[courses_list[i]] <= 2 and self[i + int(self.size / 2)] != -1:
+                if course_value[courses_list[i]] <= 2 and self[i + int(self.size / 2)] != -1 and self[i] != -1:
                     self.num_of_hard_conflicts += 10
+                if course_value[courses_list[i]] > 2 and (self[i + int(self.size / 2)] == -1 or self[i] == -1):
+                    self.num_of_soft_conflicts += 10
                 if self[i + int(self.size / 2)] != -1 and self[i] != -1:
                     if self.get_gene_prof(i) != self.get_gene_prof(i + int(self.size / 2)):
                         self.num_of_hard_conflicts += 4
@@ -82,6 +86,8 @@ class Chromosome(list):
                 if self[i + int(self.size / 2)] != -1 and self[i] != -1 and \
                         self.get_gene_class(i) != self.get_gene_class(i + int(self.size / 2)):
                     self.num_of_soft_conflicts += 1
+                if self[i] == -1 and self[i + int(self.size / 2)] == -1:
+                    self.num_of_soft_conflicts += 2
         for x in tt:
             self.num_of_soft_conflicts += (len(tt[x]) - len(set(tt[x])))
         for x in pc:
@@ -89,3 +95,12 @@ class Chromosome(list):
 
     def compute_fitness_value(self):
         return 2 - ((1 / (1 + self.num_of_hard_conflicts)) + (1 / (1 + np.arctan(self.num_of_soft_conflicts))))
+
+    def mutate_chrm(self, r_m):
+        mutated = False
+        for r in range(self.size):
+            if random.uniform(0, 1) <= r_m:
+                rnd = random.randint(0, self.size - 1)
+                self[rnd] = random.randint(0, len(self.gene_range) - 1) - 1
+                mutated = True
+        return mutated

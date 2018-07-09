@@ -1,4 +1,5 @@
 import collections
+import difflib
 
 from Chromosome import Chromosome
 
@@ -10,12 +11,18 @@ class Population(list):
             self.append(Chromosome())
 
     def fit(self):
-        f = []
         for p in self:
-            f.append(p.compute_fitness_value())
-        return f
+            p.hard_constraints_violated()
+            p.soft_constraints_violated()
 
-    def resolve_repeated(self):
+    def resolve_repeated(self, r_m):
         for i in range(len(self) - 1):
             if collections.Counter(self[i]) == collections.Counter(self[i + 1]):
-                self[i].mutate_chrm()
+                self[i].mutate_chrm(r_m)
+
+    def is_mundane(self):
+        for i in range(len(self) - 1):
+            sm = difflib.SequenceMatcher(None, self[i], self[i + 1])
+            if sm.ratio() < 0.9:
+                return False
+        return True
