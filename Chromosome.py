@@ -1,5 +1,4 @@
 import random
-import sys
 
 from file_decode import *
 
@@ -13,7 +12,6 @@ class Chromosome(list):
         self.prof_num_of_courses = {p: 0 for p in profs_list}
         self.num_of_hard_conflicts = 0
         self.num_of_soft_conflicts = 0
-        self.fitness_value = sys.maxsize
         while True:
             rnd = random.sample(self.gene_range, self.size)
             if len(rnd) == len(set(rnd)):
@@ -28,14 +26,14 @@ class Chromosome(list):
     def get_gene_prof(self, nth):
         gene = self[nth]
         if gene != -1:
-            time = gene % timeslots_num
-            return list(classprof_time.keys())[time].split('-')[0]
+            x = gene // timeslots_num
+            return list(classprof_time.keys())[x].split('-')[0]
 
     def get_gene_class(self, nth):
         gene = self[nth]
         if gene != -1:
-            time = gene % timeslots_num
-            return list(classprof_time.keys())[time].split('-')[1]
+            x = gene // timeslots_num
+            return list(classprof_time.keys())[x].split('-')[1]
 
     def is_gene_time_valid(self, nth):
         gene = self[nth]
@@ -61,7 +59,7 @@ class Chromosome(list):
             if self[i] != -1 and self.gene_values[self[i]] == 0:
                 self.num_of_hard_conflicts += 6
             if self[i] != -1 and self.get_gene_prof(i) not in course_prof[
-                courses_list[i if i < self.size / 2 else i - int(self.size / 2)]]:
+                    courses_list[i if i < self.size / 2 else i - int(self.size / 2)]]:
                 self.num_of_hard_conflicts += 8
             if self[i] != -1 and courses_list[i if i < self.size / 2 else i - int(self.size / 2)] in \
                     registers_more_than_20 and self.get_gene_class(i) not in capacity_more_than_20:

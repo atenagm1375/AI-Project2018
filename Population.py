@@ -12,7 +12,8 @@ class Population(list):
     def fit(self):
         f = []
         for p in self:
-            p.compute_fitness_value()
+            f.append(p.compute_fitness_value())
+        return f
 
     def resolve_repeated(self):
         for i in range(len(self) - 1):
