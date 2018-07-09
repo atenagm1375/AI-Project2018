@@ -85,13 +85,13 @@ class Chromosome(list):
             if i < self.size / 2:
                 if self[i + int(self.size / 2)] != -1 and self[i] != -1 and \
                         self.get_gene_class(i) != self.get_gene_class(i + int(self.size / 2)):
-                    self.num_of_soft_conflicts += 1
+                    self.num_of_soft_conflicts += 5
                 if self[i] == -1 and self[i + int(self.size / 2)] == -1:
-                    self.num_of_soft_conflicts += 2
+                    self.num_of_soft_conflicts += 8
         for x in tt:
-            self.num_of_soft_conflicts += (len(tt[x]) - len(set(tt[x])))
+            self.num_of_soft_conflicts += 5 * (len(tt[x]) - len(set(tt[x])))
         for x in pc:
-            self.num_of_soft_conflicts += (np.max(pc[x]) - np.min(pc[x]))
+            self.num_of_soft_conflicts += 4 * (np.max(pc[x]) - np.min(pc[x]))
 
     def compute_fitness_value(self):
         return 2 - ((1 / (1 + self.num_of_hard_conflicts)) + (1 / (1 + np.arctan(self.num_of_soft_conflicts))))
