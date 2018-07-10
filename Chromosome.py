@@ -67,27 +67,27 @@ class Chromosome(list):
                 ct[self.get_gene_class(i)].append(self.gene_values[self[i]] % timeslots_num)
             if i < self.size / 2:
                 if course_value[courses_list[i]] <= 2 and self[i + int(self.size / 2)] != -1 and self[i] != -1:
-                    self.num_of_hard_conflicts += 10
+                    self.num_of_hard_conflicts += 1
                 if course_value[courses_list[i]] > 2 and (self[i + int(self.size / 2)] == -1 ^ self[i] == -1):
-                    self.num_of_soft_conflicts += 10
+                    self.num_of_soft_conflicts += 1
                 if self[i + int(self.size / 2)] != -1 and self[i] != -1:
                     if self.get_gene_prof(i) != self.get_gene_prof(i + int(self.size / 2)):
-                        self.num_of_hard_conflicts += 4
+                        self.num_of_hard_conflicts += 1
                     if self.gene_values[self[i]] % timeslots_num == \
                             self.gene_values[self[i + int(self.size / 2)]] % timeslots_num:
-                        self.num_of_hard_conflicts += 4
+                        self.num_of_hard_conflicts += 1
             if self[i] != -1 and self.gene_values[self[i]] == 0:
-                self.num_of_hard_conflicts += 6
+                self.num_of_hard_conflicts += 1
             if self[i] != -1 and self.get_gene_prof(i) not in course_prof[
                     courses_list[i if i < self.size / 2 else i - int(self.size / 2)]]:
-                self.num_of_hard_conflicts += 8
+                self.num_of_hard_conflicts += 1
             if self[i] != -1 and courses_list[i if i < self.size / 2 else i - int(self.size / 2)] in \
                     registers_more_than_20 and self.get_gene_class(i) not in capacity_more_than_20:
-                self.num_of_hard_conflicts += 2
+                self.num_of_hard_conflicts += 1
         for x in pt:
-            self.num_of_hard_conflicts += (2 * (len(pt[x]) - len(set(pt[x]))))
+            self.num_of_hard_conflicts += (len(pt[x]) - len(set(pt[x])))
         for x in ct:
-            self.num_of_hard_conflicts += (2 * (len(ct[x]) - len(set(ct[x]))))
+            self.num_of_hard_conflicts += (len(ct[x]) - len(set(ct[x])))
 
     def soft_constraints_violated(self):
         pc = {p: 0 for p in profs_list}
@@ -110,7 +110,7 @@ class Chromosome(list):
             self.num_of_soft_conflicts += (np.max(pc[x]) - np.min(pc[x]))
 
     def compute_fitness_value(self):
-        return 2 - ((1 / (1 + np.square(self.num_of_hard_conflicts))) + (1 / (1 + np.sqrt(self.num_of_soft_conflicts))))
+        return 2 - ((1 / (1 + self.num_of_hard_conflicts)) + (1 / (1 + np.arctan(self.num_of_soft_conflicts))))
 
     def mutate_chrm(self, r_m):
         mutated = False
