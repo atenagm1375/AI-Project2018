@@ -4,69 +4,67 @@ from file_decode import *
 
 
 class Chromosome(list):
-    gene_values = np.ravel([list(classprof_time[i]) for i in classprof_time])
-    gene_range = range(-1, len(gene_values))
+    encoded_classprof_time = np.ravel([list(classprof_time[i]) for i in classprof_time])
 
     def __init__(self):
+        self.gene_values = [i for i in range(len(self.encoded_classprof_time)) if self.encoded_classprof_time[i] == 1]
+        self.gene_range = range(-1, len(self.gene_values))
         self.size = 2 * len(courses_list)
         self.prof_num_of_courses = {p: 0 for p in profs_list}
         self.num_of_hard_conflicts = 0
         self.num_of_soft_conflicts = 0
-        # while True:
-        #     rnd = random.sample(self.gene_range, self.size)
-        #     if len(rnd) == len(set(rnd)):
-        #         break
-        # for i in range(len(courses_list)):
-        #     if course_value[courses_list[i]] <= 2:
-        #         rnd[i + len(courses_list)] = -1
-        # super().__init__(rnd)
-        lst = [-1] * self.size
+        while True:
+            rnd = random.sample(self.gene_range, self.size)
+            if len(rnd) == len(set(rnd)):
+                break
         for i in range(len(courses_list)):
-            if not course_prof[courses_list[i]]:
-                continue
-            prof = random.sample(course_prof[courses_list[i]], 1)[0]
-            cls = random.sample(classes_list, 1)[0]
-            s = prof + '-' + str(cls)
-            index = list(classprof_time.keys()).index(s)
-            time = random.randint(0, timeslots_num - 1)
-            lst[i] = index * timeslots_num + time
-            if course_value[courses_list[i]] > 2:
-                cls = random.sample(classes_list, 1)[0]
-                s = prof + '-' + str(cls)
-                index = list(classprof_time.keys()).index(s)
-                time = random.randint(0, timeslots_num - 1)
-                lst[i + int(self.size / 2)] = index * timeslots_num + time
-        super().__init__(lst)
+            if course_value[courses_list[i]] <= 2:
+                rnd[i + len(courses_list)] = -1
+        super().__init__(rnd)
+        # lst = [-1] * self.size
+        # for i in range(len(courses_list)):
+        #     if not course_prof[courses_list[i]]:
+        #         continue
+        #     lst[i] = self.gene_values.index(self.find_skilled_prof_set_time(i))
+        #     if course_value[courses_list[i]] > 2:
+        #         lst[i + int(self.size / 2)] = self.gene_values.index(self.find_skilled_prof_set_time(i))
+        # super().__init__(lst)
         self.hard_constraints_violated()
         self.soft_constraints_violated()
+
+    # def find_skilled_prof_set_time(self, nth):
+    #     prof = random.sample(course_prof[courses_list[nth]], 1)[0]
+    #     cls = random.sample(classes_list, 1)[0]
+    #     s = prof + '-' + str(cls)
+    #     index = list(classprof_time.keys()).index(s)
+    #     time = random.randint(0, timeslots_num - 1)
+    #     return index * timeslots_num + time
 
     def get_gene_prof(self, nth):
         gene = self[nth]
         if gene != -1:
-            x = gene // timeslots_num
-            if x >= len(list(classprof_time.keys())):
-                print(gene, x, len(list(classprof_time.keys())))
+            x = self.gene_values[gene] // timeslots_num
             return list(classprof_time.keys())[x].split('-')[0]
 
     def get_gene_class(self, nth):
         gene = self[nth]
         if gene != -1:
-            x = gene // timeslots_num
+            x = self.gene_values[gene] // timeslots_num
             return list(classprof_time.keys())[x].split('-')[1]
 
-    def is_gene_time_valid(self, nth):
-        gene = self[nth]
-        if gene != -1:
-            return self.gene_values[gene] == 1
-        return True
+    # def is_gene_time_valid(self, nth):
+    #     gene = self[nth]
+    #     if gene != -1:
+    #         return self.gene_values[gene] == 1
+    #     return True
 
     def hard_constraints_violated(self):
         pt = {p: [] for p in profs_list}
         ct = {c: [] for c in classes_list}
         for i in range(self.size):
             if self[i] != -1:
-                pt[self.get_gene_prof(i)].append(self[i] % timeslots_num)
-                ct[self.get_gene_class(i)].append(self[i] % timeslots_num)
+                pt[self.get_gene_prof(i)].append(self.gene_values[self[i]] % timeslots_num)
+                ct[self.get_gene_class(i)].append(self.gene_values[self[i]] % timeslots_num)
             if i < self.size / 2:
                 if course_value[courses_list[i]] <= 2 and self[i + int(self.size / 2)] != -1 and self[i] != -1:
                     self.num_of_hard_conflicts += 10
@@ -75,7 +73,8 @@ class Chromosome(list):
                 if self[i + int(self.size / 2)] != -1 and self[i] != -1:
                     if self.get_gene_prof(i) != self.get_gene_prof(i + int(self.size / 2)):
                         self.num_of_hard_conflicts += 4
-                    if self[i] % timeslots_num == self[i + int(self.size / 2)] % timeslots_num:
+                    if self.gene_values[self[i]] % timeslots_num == \
+                            self.gene_values[self[i + int(self.size / 2)]] % timeslots_num:
                         self.num_of_hard_conflicts += 4
             if self[i] != -1 and self.gene_values[self[i]] == 0:
                 self.num_of_hard_conflicts += 6
@@ -102,22 +101,24 @@ class Chromosome(list):
             if i < self.size / 2:
                 if self[i + int(self.size / 2)] != -1 and self[i] != -1 and \
                         self.get_gene_class(i) != self.get_gene_class(i + int(self.size / 2)):
-                    self.num_of_soft_conflicts += 5
+                    self.num_of_soft_conflicts += 1
                 if self[i] == -1 and self[i + int(self.size / 2)] == -1:
-                    self.num_of_soft_conflicts += 8
+                    self.num_of_soft_conflicts += 1
         for x in tt:
-            self.num_of_soft_conflicts += 5 * (len(tt[x]) - len(set(tt[x])))
+            self.num_of_soft_conflicts += (len(tt[x]) - len(set(tt[x])))
         for x in pc:
-            self.num_of_soft_conflicts += 4 * (np.max(pc[x]) - np.min(pc[x]))
+            self.num_of_soft_conflicts += (np.max(pc[x]) - np.min(pc[x]))
 
     def compute_fitness_value(self):
-        return 2 - ((1 / (1 + self.num_of_hard_conflicts ** 2)) + (1 / (1 + self.num_of_soft_conflicts)))
+        return 2 - ((1 / (1 + np.square(self.num_of_hard_conflicts))) + (1 / (1 + np.sqrt(self.num_of_soft_conflicts))))
 
     def mutate_chrm(self, r_m):
         mutated = False
         for r in range(self.size):
             if random.uniform(0, 1) <= r_m:
                 rnd = random.randint(0, self.size - 1)
+                # self[rnd] = self.gene_values.index(self.find_skilled_prof_set_time(rnd if rnd < self.size / 2
+                #                                                                    else rnd - int(self.size / 2)))
                 self[rnd] = random.randint(0, len(self.gene_range) - 1) - 1
                 mutated = True
         return mutated
