@@ -15,14 +15,12 @@ def selection(pop):
 
 def crossover(pop, prob):
     children = Population()
-    for first_par in pop:
-        pop2 = deepcopy(pop)
-        pop2.remove(first_par)
-        for second_par in pop2:
+    for first_par in range(len(pop)):
+        for second_par in range(first_par, len(pop)):
             if random.uniform(0, 1) <= prob:
-                points = random.sample(range(first_par.size), 2)
-                child1 = deepcopy(first_par)
-                child2 = deepcopy(second_par)
+                points = random.sample(range(pop[first_par].size), 2)
+                child1 = deepcopy(pop[first_par])
+                child2 = deepcopy(pop[second_par])
                 child1[points[0]:points[1]], child2[points[0]:points[1]] = \
                     child2[points[0]:points[1]], child1[points[0]:points[1]]
                 children.append(child1)
@@ -43,7 +41,6 @@ def mutation(pop, rate):
 
 def replacement(pop, cross, mute):
     chld = cross + mute
-    print(type(chld), type(cross), type(mute))
     chld.sort(key=Chromosome.compute_fitness_value)
     pop[round(0.2 * number_of_population):] = chld[:round(0.8 * number_of_population)]
     return pop
