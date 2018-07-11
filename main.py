@@ -6,27 +6,25 @@ from Population import Population
 
 
 def selection(pop):
-    n = round(0.1 * number_of_population)
-    new_pop = pop[:n]
-    new_pop += random.sample(pop[n:], round(0.15 * number_of_population))
-    new_pop.sort(key=Chromosome.compute_fitness_value)
+    ranked_pop = [1 / (i + 1) for i in range(len(pop))]
+    new_pop = random.choices(pop, weights=ranked_pop, k=round(0.6 * number_of_population))
     return new_pop
 
 
 def crossover(pop, prob):
     children = Population()
-    for first_par in range(len(pop)):
-        for second_par in range(first_par, len(pop)):
-            if random.uniform(0, 1) <= prob:
-                points = random.sample(range(pop[first_par].size), 2)
-                child1 = deepcopy(pop[first_par])
-                child2 = deepcopy(pop[second_par])
-                child1[points[0]:points[1]], child2[points[0]:points[1]] = \
-                    child2[points[0]:points[1]], child1[points[0]:points[1]]
-                children.append(child1)
-                children.append(child2)
+    while True:
+        if len(children) == round(prob * number_of_population):
+            break
+        parents = random.sample(pop, 2)
+        points = random.sample(range(parents[0].size), 2)
+        child1 = deepcopy(parents[0])
+        child2 = deepcopy(parents[1])
+        child1[points[0]:points[1]], child2[points[0]:points[1]] = \
+            child2[points[0]:points[1]], child1[points[0]:points[1]]
+        children.append(child1)
+        children.append(child2)
     children.fit()
-    children.sort(key=Chromosome.compute_fitness_value)
     return children
 
 
@@ -55,7 +53,7 @@ while True:
     iteration += 1
     population.sort(key=Chromosome.compute_fitness_value)
     population.resolve_repeated(0.1)
-    r_m = 0.05
+    r_m = 0.1
     p_c = 0.8
     if len(best) < 10:
         best.append(population[0].compute_fitness_value())
