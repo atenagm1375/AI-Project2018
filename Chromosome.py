@@ -69,8 +69,6 @@ class Chromosome(list):
                         self.num_of_hard_conflicts += 1
                     if self[i] % timeslots_num == self[i + self.size // 2] % timeslots_num:
                         self.num_of_hard_conflicts += 1
-            if self[i] != -1 and self.gene_values[self[i]] == 0:
-                self.num_of_hard_conflicts += 1
             if self[i] != -1 and self.get_gene_prof(i) not in course_prof[
                     courses_list[i if i < self.size / 2 else i - self.size // 2]]:
                 self.num_of_hard_conflicts += 1
