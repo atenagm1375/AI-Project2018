@@ -29,9 +29,6 @@ class Chromosome(list):
             if course_value[courses_list[i]] > 2:
                 lst[i + self.size // 2] = find_skilled_prof(i)
         super().__init__(lst)
-        for i in range(self.size):
-            if self[i] != -1:
-                self.gene_values[self[i]] -= 2
         self.hard_constraints_violated()
         self.soft_constraints_violated()
 
@@ -93,7 +90,7 @@ class Chromosome(list):
                 pc[self.get_gene_prof(i)] += 1
                 if courses_list[i if i < self.size / 2 else i - self.size // 2] in course_term.keys():
                     tt[course_term[courses_list[i if i < self.size / 2 else i - self.size // 2]]].append(
-                        self.gene_values[self[i]])
+                        self[i] % timeslots_num)
             if i < self.size / 2:
                 if self[i + self.size // 2] != -1 and self[i] != -1 and \
                         self.get_gene_class(i) != self.get_gene_class(i + int(self.size / 2)):
@@ -106,87 +103,25 @@ class Chromosome(list):
             self.num_of_soft_conflicts += (np.max(pc[x]) - np.min(pc[x]))
 
     def compute_fitness_value(self):
-        return 2 - ((1 / (1 + 2 * self.num_of_hard_conflicts)) + (1 / (1 + self.num_of_soft_conflicts)))
+        return 2 - ((1 / (1 + self.num_of_hard_conflicts)) + (1 / (1 + np.arctan(self.num_of_soft_conflicts))))
         # return 1 - (1 / (1 + np.sqrt(self.num_of_hard_conflicts) + np.arctan(self.num_of_soft_conflicts)))
 
     def mutate_chrm(self, r_m):
         mutated = False
         for r in range(self.size):
             if random.uniform(0, 1) <= r_m:
-                # rnd1 = random.randint(0, self.size - 1)
                 # rnd2 = random.randint(0, self.size - 1)
-                # if self[rnd1] != -1:
-                #     self.gene_values[self[rnd1]] += 2
-                # if self[rnd2] != -1:
-                #     self.gene_values[self[rnd2]] += 2
                 # ll = list(classprof_time.keys())
-                # t1 = self[rnd1] % timeslots_num
+                # t1 = self[r] % timeslots_num
                 # t2 = self[rnd2] % timeslots_num
-                # prof1 = ll[self[rnd1] // timeslots_num].split('-')[0]
+                # prof1 = ll[self[r] // timeslots_num].split('-')[0]
                 # prof2 = ll[self[rnd2] // timeslots_num].split('-')[0]
-                # class1 = ll[self[rnd1] // timeslots_num].split('-')[1]
+                # class1 = ll[self[r] // timeslots_num].split('-')[1]
                 # class2 = ll[self[rnd2] // timeslots_num].split('-')[1]
                 # pc1 = prof1 + '-' + class2
                 # pc2 = prof2 + '-' + class1
-                # self[rnd1] = ll.index(pc1) * timeslots_num + t2
+                # self[r] = ll.index(pc1) * timeslots_num + t2
                 # self[rnd2] = ll.index(pc2) * timeslots_num + t1
-                # if self[rnd1] != -1:
-                #     self.gene_values[self[rnd1]] -= 2
-                # if self[rnd2] != -1:
-                #     self.gene_values[self[rnd2]] -= 2
-                if self[r] != -1 and self.gene_values[self[r]] != 0:
-                    self.gene_values[self[r]] += 2
                 self[r] = find_skilled_prof(r if r < self.size / 2 else r - self.size // 2)
-                if self[r] != -1:
-                    self.gene_values[self[r]] -= 2
                 mutated = True
         return mutated
-
-    def find_free_time_assist(self, nth, ind):
-        ll = list(classprof_time.keys())
-        val = ll.index(ind) * timeslots_num
-        for i in range(timeslots_num):
-            if self.gene_values[val + i] == 1:
-                if self[nth] != -1:
-                    self.gene_values[self[nth]] += 2
-                self.gene_values[val + i] -= 2
-                return val + i
-        return -1
-
-    def find_free_time(self, nth):
-        t = -1
-        ll = list(classprof_time.keys())
-        prof = ll[self[nth] // timeslots_num].split('-')[0]
-        cls = ll[self[nth] // timeslots_num].split('-')[1]
-        if courses_list[nth if nth < self.size // 2 else nth - self.size // 2] in registers_more_than_20:
-            if cls in capacity_more_than_20:
-                t = self.find_free_time_assist(nth, prof + '-' + cls)
-                if t != -1:
-                    return t
-            else:
-                for c in capacity_more_than_20:
-                    ind = prof + '-' + str(c)
-                    t = self.find_free_time_assist(nth, ind)
-                    if t != -1:
-                        return t
-        else:
-            for c in classes_list:
-                ind = prof + '-' + str(c)
-                t = self.find_free_time_assist(nth, ind)
-                if t != -1:
-                    return t
-        return t
-
-    def repair(self):
-        for i in range(self.size):
-            if self[i] != -1:
-                if i > self.size / 2 and self[i] != -1 \
-                        and self.get_gene_prof(i) != self.get_gene_prof(i - self.size // 2):
-                    ll = list(classprof_time.keys())
-                    t2 = self[i - self.size // 2] % timeslots_num
-                    prof1 = ll[self[i] // timeslots_num].split('-')[0]
-                    class2 = ll[self[i - self.size // 2] // timeslots_num].split('-')[1]
-                    pc1 = prof1 + '-' + class2
-                    self[i] = ll.index(pc1) * timeslots_num + t2
-                if self.gene_values[self[i]] < -1:
-                    self[i] = self.find_free_time(i)
