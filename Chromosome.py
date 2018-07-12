@@ -110,20 +110,18 @@ class Chromosome(list):
         mutated = False
         for r in range(self.size):
             if random.uniform(0, 1) <= r_m:
-                # rnd1 = random.randint(0, self.size - 1)
-                rnd2 = random.randint(0, self.size - 1)
-                ll = list(classprof_time.keys())
-                t1 = self[r] % timeslots_num
-                t2 = self[rnd2] % timeslots_num
-                prof1 = ll[self[r] // timeslots_num].split('-')[0]
-                prof2 = ll[self[rnd2] // timeslots_num].split('-')[0]
-                class1 = ll[self[r] // timeslots_num].split('-')[1]
-                class2 = ll[self[rnd2] // timeslots_num].split('-')[1]
-                pc1 = prof1 + '-' + class2
-                pc2 = prof2 + '-' + class1
-                self[r] = ll.index(pc1) * timeslots_num + t2
-                self[rnd2] = ll.index(pc2) * timeslots_num + t1
-                # self[rnd] = random.randint(0, len(self.gene_range) - 1) - 1
-                # self[rnd] = find_skilled_prof(rnd if rnd < self.size / 2 else rnd - self.size // 2)
+                # rnd2 = random.randint(0, self.size - 1)
+                # ll = list(classprof_time.keys())
+                # t1 = self[r] % timeslots_num
+                # t2 = self[rnd2] % timeslots_num
+                # prof1 = ll[self[r] // timeslots_num].split('-')[0]
+                # prof2 = ll[self[rnd2] // timeslots_num].split('-')[0]
+                # class1 = ll[self[r] // timeslots_num].split('-')[1]
+                # class2 = ll[self[rnd2] // timeslots_num].split('-')[1]
+                # pc1 = prof1 + '-' + class2
+                # pc2 = prof2 + '-' + class1
+                # self[r] = ll.index(pc1) * timeslots_num + t2
+                # self[rnd2] = ll.index(pc2) * timeslots_num + t1
+                self[r] = find_skilled_prof(r if r < self.size / 2 else r - self.size // 2)
                 mutated = True
         return mutated
