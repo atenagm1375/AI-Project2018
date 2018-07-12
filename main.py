@@ -21,8 +21,10 @@ def crossover(pop, prob, swap=0.5):
         child2 = deepcopy(parents[1])
         for i in range(child1.size):
             if random.uniform(0, 1) >= swap:
-                child1.gene_values[child1[i]] += 2
-                child2.gene_values[child2[i]] += 2
+                if child1[i] != -1 and child1.gene_values[child1[i]]:
+                    child1.gene_values[child1[i]] += 2
+                if child2[i] != -1 and child2.gene_values[child2[i]]:
+                    child2.gene_values[child2[i]] += 2
                 if child1[i] != child2[i]:
                     child1[i], child2[i] = child2[i], child1[i]
                 elif child1[i] != -1:
@@ -33,8 +35,10 @@ def crossover(pop, prob, swap=0.5):
                             break
                         child1[i] = child1[i] // timeslots_num + t1
                         child2[i] = child2[i] // timeslots_num + t2
-                child1.gene_values[child1[i]] -= 2
-                child2.gene_values[child2[i]] -= 2
+                if child1[i] != -1:
+                    child1.gene_values[child1[i]] -= 2
+                if child2[i] != -1:
+                    child2.gene_values[child2[i]] -= 2
         children.append(child1)
         children.append(child2)
     children.fit()

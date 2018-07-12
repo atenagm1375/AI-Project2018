@@ -26,11 +26,12 @@ class Chromosome(list):
             if not course_prof[courses_list[i]]:
                 continue
             lst[i] = find_skilled_prof(i)
-            self.gene_values[lst[i]] -= 2
             if course_value[courses_list[i]] > 2:
                 lst[i + self.size // 2] = find_skilled_prof(i)
-                self.gene_values[lst[i + self.size // 2]] -= 2
         super().__init__(lst)
+        for i in range(self.size):
+            if self[i] != -1:
+                self.gene_values[self[i]] -= 2
         self.hard_constraints_violated()
         self.soft_constraints_violated()
 
@@ -105,32 +106,39 @@ class Chromosome(list):
             self.num_of_soft_conflicts += (np.max(pc[x]) - np.min(pc[x]))
 
     def compute_fitness_value(self):
-        return 2 - ((1 / (1 + self.num_of_hard_conflicts)) + (1 / (1 + np.arctan(self.num_of_soft_conflicts))))
+        return 2 - ((1 / (1 + 2 * self.num_of_hard_conflicts)) + (1 / (1 + self.num_of_soft_conflicts)))
         # return 1 - (1 / (1 + np.sqrt(self.num_of_hard_conflicts) + np.arctan(self.num_of_soft_conflicts)))
 
     def mutate_chrm(self, r_m):
         mutated = False
         for r in range(self.size):
             if random.uniform(0, 1) <= r_m:
-                rnd1 = random.randint(0, self.size - 1)
-                rnd2 = random.randint(0, self.size - 1)
-                self.gene_values[self[rnd1]] += 2
-                self.gene_values[self[rnd2]] += 2
-                ll = list(classprof_time.keys())
-                t1 = self[rnd1] % timeslots_num
-                t2 = self[rnd2] % timeslots_num
-                prof1 = ll[self[rnd1] // timeslots_num].split('-')[0]
-                prof2 = ll[self[rnd2] // timeslots_num].split('-')[0]
-                class1 = ll[self[rnd1] // timeslots_num].split('-')[1]
-                class2 = ll[self[rnd2] // timeslots_num].split('-')[1]
-                pc1 = prof1 + '-' + class2
-                pc2 = prof2 + '-' + class1
-                self[rnd1] = ll.index(pc1) * timeslots_num + t2
-                self[rnd2] = ll.index(pc2) * timeslots_num + t1
-                self.gene_values[self[rnd1]] -= 2
-                self.gene_values[self[rnd2]] -= 2
-                # self[rnd] = random.randint(0, len(self.gene_range) - 1) - 1
-                # self[rnd] = find_skilled_prof(rnd if rnd < self.size / 2 else rnd - self.size // 2)
+                # rnd1 = random.randint(0, self.size - 1)
+                # rnd2 = random.randint(0, self.size - 1)
+                # if self[rnd1] != -1:
+                #     self.gene_values[self[rnd1]] += 2
+                # if self[rnd2] != -1:
+                #     self.gene_values[self[rnd2]] += 2
+                # ll = list(classprof_time.keys())
+                # t1 = self[rnd1] % timeslots_num
+                # t2 = self[rnd2] % timeslots_num
+                # prof1 = ll[self[rnd1] // timeslots_num].split('-')[0]
+                # prof2 = ll[self[rnd2] // timeslots_num].split('-')[0]
+                # class1 = ll[self[rnd1] // timeslots_num].split('-')[1]
+                # class2 = ll[self[rnd2] // timeslots_num].split('-')[1]
+                # pc1 = prof1 + '-' + class2
+                # pc2 = prof2 + '-' + class1
+                # self[rnd1] = ll.index(pc1) * timeslots_num + t2
+                # self[rnd2] = ll.index(pc2) * timeslots_num + t1
+                # if self[rnd1] != -1:
+                #     self.gene_values[self[rnd1]] -= 2
+                # if self[rnd2] != -1:
+                #     self.gene_values[self[rnd2]] -= 2
+                if self[r] != -1 and self.gene_values[self[r]] != 0:
+                    self.gene_values[self[r]] += 2
+                self[r] = find_skilled_prof(r if r < self.size / 2 else r - self.size // 2)
+                if self[r] != -1:
+                    self.gene_values[self[r]] -= 2
                 mutated = True
         return mutated
 
@@ -139,7 +147,8 @@ class Chromosome(list):
         val = ll.index(ind) * timeslots_num
         for i in range(timeslots_num):
             if self.gene_values[val + i] == 1:
-                self.gene_values[self[nth]] += 2
+                if self[nth] != -1:
+                    self.gene_values[self[nth]] += 2
                 self.gene_values[val + i] -= 2
                 return val + i
         return -1
@@ -171,7 +180,8 @@ class Chromosome(list):
     def repair(self):
         for i in range(self.size):
             if self[i] != -1:
-                if i > self.size / 2 and self.get_gene_prof(i) != self.get_gene_prof(i - self.size // 2):
+                if i > self.size / 2 and self[i] != -1 \
+                        and self.get_gene_prof(i) != self.get_gene_prof(i - self.size // 2):
                     ll = list(classprof_time.keys())
                     t2 = self[i - self.size // 2] % timeslots_num
                     prof1 = ll[self[i] // timeslots_num].split('-')[0]
