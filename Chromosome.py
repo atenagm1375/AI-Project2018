@@ -53,6 +53,7 @@ class Chromosome(list):
         return True
 
     def hard_constraints_violated(self):
+        self.num_of_hard_conflicts = 0
         pt = {p: [] for p in profs_list}
         ct = {c: [] for c in classes_list}
         for i in range(self.size):
@@ -83,6 +84,7 @@ class Chromosome(list):
             self.num_of_hard_conflicts += (len(ct[x]) - len(set(ct[x])))
 
     def soft_constraints_violated(self):
+        self.num_of_soft_conflicts = 0
         pc = {p: 0 for p in profs_list}
         tt = {t: [] for t in term_course.keys()}
         for i in range(self.size):
