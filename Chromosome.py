@@ -53,6 +53,7 @@ class Chromosome(list):
         return True
 
     def hard_constraints_violated(self):
+        self.num_of_hard_conflicts = 0
         pt = {p: [] for p in profs_list}
         ct = {c: [] for c in classes_list}
         for i in range(self.size):
@@ -83,6 +84,7 @@ class Chromosome(list):
             self.num_of_hard_conflicts += (len(ct[x]) - len(set(ct[x])))
 
     def soft_constraints_violated(self):
+        self.num_of_soft_conflicts = 0
         pc = {p: 0 for p in profs_list}
         tt = {t: [] for t in term_course.keys()}
         for i in range(self.size):
@@ -125,3 +127,52 @@ class Chromosome(list):
                 self[r] = find_skilled_prof(r if r < self.size / 2 else r - self.size // 2)
                 mutated = True
         return mutated
+
+    def find_free_time_assist(self, nth, ind):
+        ll = list(classprof_time.keys())
+        val = ll.index(ind) * timeslots_num
+        for i in range(timeslots_num):
+            if self.gene_values[val + i] == 1:
+                if self[nth] != -1:
+                    self.gene_values[self[nth]] += 2
+                self.gene_values[val + i] -= 2
+                return val + i
+        return -1
+
+    def find_free_time(self, nth):
+        t = -1
+        ll = list(classprof_time.keys())
+        prof = ll[self[nth] // timeslots_num].split('-')[0]
+        cls = ll[self[nth] // timeslots_num].split('-')[1]
+        if courses_list[nth if nth < self.size // 2 else nth - self.size // 2] in registers_more_than_20:
+            if cls in capacity_more_than_20:
+                t = self.find_free_time_assist(nth, prof + '-' + cls)
+                if t != -1:
+                    return t
+            else:
+                for c in capacity_more_than_20:
+                    ind = prof + '-' + str(c)
+                    t = self.find_free_time_assist(nth, ind)
+                    if t != -1:
+                        return t
+        else:
+            for c in classes_list:
+                ind = prof + '-' + str(c)
+                t = self.find_free_time_assist(nth, ind)
+                if t != -1:
+                    return t
+        return t
+
+    def repair(self):
+        for i in range(self.size):
+            if self[i] != -1:
+                if i > self.size / 2 and self[i] != -1 \
+                        and self.get_gene_prof(i) != self.get_gene_prof(i - self.size // 2):
+                    ll = list(classprof_time.keys())
+                    t2 = self[i - self.size // 2] % timeslots_num
+                    prof1 = ll[self[i] // timeslots_num].split('-')[0]
+                    class2 = ll[self[i - self.size // 2] // timeslots_num].split('-')[1]
+                    pc1 = prof1 + '-' + class2
+                    self[i] = ll.index(pc1) * timeslots_num + t2
+                if self.gene_values[self[i]] < -1:
+                    self[i] = self.find_free_time(i)
