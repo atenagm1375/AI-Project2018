@@ -90,7 +90,7 @@ class Chromosome(list):
                 pc[self.get_gene_prof(i)] += 1
                 if courses_list[i if i < self.size / 2 else i - self.size // 2] in course_term.keys():
                     tt[course_term[courses_list[i if i < self.size / 2 else i - self.size // 2]]].append(
-                        self.gene_values[self[i]])
+                        self[i] % timeslots_num)
             if i < self.size / 2:
                 if self[i + self.size // 2] != -1 and self[i] != -1 and \
                         self.get_gene_class(i) != self.get_gene_class(i + int(self.size / 2)):
