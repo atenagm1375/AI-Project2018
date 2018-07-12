@@ -21,6 +21,8 @@ def crossover(pop, prob, swap=0.5):
         child2 = deepcopy(parents[1])
         for i in range(child1.size):
             if random.uniform(0, 1) >= swap:
+                child1.gene_values[child1[i]] += 2
+                child2.gene_values[child2[i]] += 2
                 if child1[i] != child2[i]:
                     child1[i], child2[i] = child2[i], child1[i]
                 elif child1[i] != -1:
@@ -31,6 +33,8 @@ def crossover(pop, prob, swap=0.5):
                             break
                         child1[i] = child1[i] // timeslots_num + t1
                         child2[i] = child2[i] // timeslots_num + t2
+                child1.gene_values[child1[i]] -= 2
+                child2.gene_values[child2[i]] -= 2
         children.append(child1)
         children.append(child2)
     children.fit()
@@ -50,6 +54,8 @@ def mutation(pop, rate):
 def replacement(pop, cross, mute):
     chld = cross
     chld += mute
+    chld.repair_function()
+    chld.fit()
     chld.sort(key=Chromosome.compute_fitness_value)
     pop[round(0.2 * number_of_population):] = chld[:round(0.8 * number_of_population)]
     return pop
@@ -75,6 +81,8 @@ def main():
         else:
             best[0] = population[0].compute_fitness_value()
         print(iteration, population[0].num_of_hard_conflicts, population[0].num_of_soft_conflicts, len(population))
+        print(population[0].gene_values)
+        print(population[0])
         if population.is_mundane():
             break
         selected_population = selection(population)

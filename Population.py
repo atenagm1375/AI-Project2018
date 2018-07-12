@@ -15,6 +15,10 @@ class Population(list):
             p.hard_constraints_violated()
             p.soft_constraints_violated()
 
+    def repair_function(self):
+        for p in self:
+            p.repair()
+
     def resolve_repeated(self, r_m):
         for i in range(len(self) - 1):
             if collections.Counter(self[i]) == collections.Counter(self[i + 1]):
