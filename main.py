@@ -51,8 +51,10 @@ def replacement(pop, cross, mute):
     chld = cross
     chld += mute
     chld.sort(key=Chromosome.compute_fitness_value)
-    pop[round(0.2 * number_of_population):] = chld[:round(0.8 * number_of_population)]
-    return pop
+    chld += pop[:round(0.2 * number_of_population)]
+    return chld
+    # pop[round(0.2 * number_of_population):] = chld[:round(0.8 * number_of_population)]
+    # return pop
 
 
 def main():
