@@ -8,7 +8,7 @@ free_class_dir = './files/FreeClass/'
 free_time_dir = './files/ProfFreeTime/'
 skill_dir = './files/SKILL/'
 
-skill_filenum, free_time_filenum, free_class_filenum, capacity_filenum, register_filenum, prof_num = 0, 0, 0, 2, 1, 10
+skill_filenum, free_time_filenum, free_class_filenum, capacity_filenum, register_filenum, prof_num = 8, 0, 0, 2, 1, 10
 
 skill_file = pd.read_excel(skill_dir + 'profskill' + str(skill_filenum) + '_profnumber-' + str(prof_num)
                            + '.xlsx', sheet_name=None)
@@ -44,7 +44,7 @@ courses_list = list(skill_sheet1.keys())
 
 course_value = {c: int(c.split('-')[1]) for c in courses_list}
 
-course_prof = {i: [j  for j in profs_list if skill_sheet1[i][j] == 1] for i in courses_list}
+course_prof = {i: [j for j in profs_list if skill_sheet1[i][j] == 1] for i in courses_list}
 
 prof_course = {i: [j for j in courses_list if skill_sheet1[j][i] == 1] for i in profs_list}
 
@@ -59,7 +59,7 @@ classes_list = list(free_class_file.keys())
 
 class_time = {i: np.ravel(free_class_file[i]) for i in free_class_file.keys()}
 
-classprof_time = {i + '-' + j:class_time[j] & prof_time[i] for i in profs_list for j in class_time.keys()}
+classprof_time = {i + '-' + j: class_time[j] & prof_time[i] for i in profs_list for j in class_time.keys()}
 
 del free_time_file
 del free_class_file

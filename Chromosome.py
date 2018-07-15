@@ -3,13 +3,12 @@ import random
 from file_decode import *
 
 
-def find_skilled_prof(nth):
-    prof = random.sample(course_prof[courses_list[nth]], 1)[0]
-    cls = random.sample(classes_list, 1)[0]
-    s = prof + '-' + str(cls)
-    index = list(classprof_time.keys()).index(s)
-    time = random.randint(0, timeslots_num - 1)
-    return index * timeslots_num + time
+
+    # cls = random.sample(classes_list, 1)[0]
+    # s = prof + '-' + str(cls)
+    # index = list(classprof_time.keys()).index(s)
+    # time = random.randint(0, timeslots_num - 1)
+    # return index * timeslots_num + time
 
 
 class Chromosome(list):
@@ -25,12 +24,25 @@ class Chromosome(list):
         for i in range(len(courses_list)):
             if not course_prof[courses_list[i]]:
                 continue
-            lst[i] = find_skilled_prof(i)
+            lst[i] = self.find_skilled_prof(i)
             if course_value[courses_list[i]] > 2:
-                lst[i + self.size // 2] = find_skilled_prof(i)
+                lst[i + self.size // 2] = self.find_skilled_prof(i)
         super().__init__(lst)
         self.hard_constraints_violated()
         self.soft_constraints_violated()
+
+    def find_skilled_prof(self, nth):
+        prof = random.sample(course_prof[courses_list[nth]], 1)[0]
+        indexes = [i for i in range(len(classprof_time.keys())) if list(
+            classprof_time.keys())[i].split('-')[0] == prof]
+        lst = []
+        for i in indexes:
+            for j in range(timeslots_num):
+                if self.gene_values[i * timeslots_num + j] == 1:
+                    lst.append(i * timeslots_num + j)
+        if not lst:
+            return -1
+        return random.choice(lst)
 
     def get_gene_prof(self, nth):
         gene = self[nth]
@@ -127,6 +139,6 @@ class Chromosome(list):
                 # self[rnd2] = ll.index(pc2) * timeslots_num + t1
                 if not course_prof[courses_list[r if r < self.size / 2 else r - self.size // 2]]:
                     continue
-                self[r] = find_skilled_prof(r if r < self.size / 2 else r - self.size // 2)
+                self[r] = self.find_skilled_prof(r if r < self.size / 2 else r - self.size // 2)
                 mutated = True
         return mutated

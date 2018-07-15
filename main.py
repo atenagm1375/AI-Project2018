@@ -60,7 +60,7 @@ def replacement(pop, cross, mute):
 
 def main():
     global number_of_population
-    number_of_population = 200
+    number_of_population = 100
     population = Population(number_of_population)
     best = []
 
