@@ -98,7 +98,7 @@ class Chromosome(list):
                         self.get_gene_class(i) != self.get_gene_class(i + int(self.size / 2)):
                     self.num_of_soft_conflicts += 1
                 if self[i] == -1 and self[i + self.size // 2] == -1:
-                    self.num_of_soft_conflicts += 1
+                    self.num_of_soft_conflicts += 5
         for x in tt:
             self.num_of_soft_conflicts += (len(tt[x]) - len(set(tt[x])))
         for x in pc:
@@ -125,6 +125,8 @@ class Chromosome(list):
                 # pc2 = prof2 + '-' + class1
                 # self[r] = ll.index(pc1) * timeslots_num + t2
                 # self[rnd2] = ll.index(pc2) * timeslots_num + t1
+                if not course_prof[courses_list[r if r < self.size / 2 else r - self.size // 2]]:
+                    continue
                 self[r] = find_skilled_prof(r if r < self.size / 2 else r - self.size // 2)
                 mutated = True
         return mutated

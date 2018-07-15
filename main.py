@@ -51,15 +51,16 @@ def replacement(pop, cross, mute):
     chld = cross
     chld += mute
     chld.sort(key=Chromosome.compute_fitness_value)
-    chld += pop[:round(0.2 * number_of_population)]
-    return chld
-    # pop[round(0.2 * number_of_population):] = chld[:round(0.8 * number_of_population)]
-    # return pop
+    # n = round(0.1 * number_of_population)
+    # chld[len(chld) - n:] = pop[:n]
+    # return chld
+    pop[round(0.1 * number_of_population):] = chld[:round(0.9 * number_of_population)]
+    return pop
 
 
 def main():
     global number_of_population
-    number_of_population = 100
+    number_of_population = 200
     population = Population(number_of_population)
     best = []
 
