@@ -41,13 +41,14 @@ def crossover(pop, prob, swap=0.5):
     return children
 
 
-def mutation(pop, rate):
+def mutation(pop, prob, rate=0.25):
     print('mutation')
     children = Population()
     pop2 = deepcopy(pop)
     for p in pop2:
-        if p.mutate_chrm(rate):
-            children.append(p)
+        if random.uniform(0, 1) <= prob:
+            if p.mutate_chrm(rate):
+                children.append(p)
     children.fit()
     return children
 
@@ -80,7 +81,7 @@ def main():
         population.resolve_repeated(0.1)
         # for p in population:
         #     print(p.num_of_hard_conflicts, p.num_of_soft_conflicts)
-        r_m = 0.05
+        p_r = 0.05
         p_c = 0.8
         # if len(best) < 10:
         #     best.append(population[0].compute_fitness_value())
@@ -91,7 +92,7 @@ def main():
             break
         selected_population = selection(population)
         cross_children = crossover(selected_population, p_c)
-        mut_children = mutation(cross_children, r_m)
+        mut_children = mutation(cross_children, p_r)
         population = replacement(population, cross_children, mut_children)
 
 

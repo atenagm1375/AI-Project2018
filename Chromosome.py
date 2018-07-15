@@ -117,7 +117,7 @@ class Chromosome(list):
             self.num_of_soft_conflicts += (np.max(pc[x]) - np.min(pc[x]))
 
     def compute_fitness_value(self):
-        return np.arctan(self.num_of_hard_conflicts * 10 + self.num_of_soft_conflicts)
+        return np.log(self.num_of_hard_conflicts * 10 + self.num_of_soft_conflicts)
         # return 2 - ((1 / (1 + np.sqrt(self.num_of_hard_conflicts))) + (1 / (1 + np.square(self.num_of_soft_conflicts))))
         # return 1 - (1 / (1 + np.sqrt(self.num_of_hard_conflicts) + np.arctan(self.num_of_soft_conflicts)))
 
