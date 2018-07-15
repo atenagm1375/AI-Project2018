@@ -78,7 +78,7 @@ def main():
     while True:
         iteration += 1
         population.sort(key=Chromosome.compute_fitness_value)
-        population.resolve_repeated(0.1)
+        # population.resolve_repeated(0.1)
         # for p in population:
         #     print(p.num_of_hard_conflicts, p.num_of_soft_conflicts)
         p_r = 0.05
