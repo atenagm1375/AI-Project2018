@@ -21,13 +21,13 @@ class Chromosome(list):
         self.num_of_hard_conflicts = 0
         self.num_of_soft_conflicts = 0
         lst = [-1] * self.size
+        super().__init__(lst)
         for i in range(len(courses_list)):
             if not course_prof[courses_list[i]]:
                 continue
-            lst[i] = self.find_skilled_prof(i)
+            self[i] = self.find_skilled_prof(i)
             if course_value[courses_list[i]] > 2:
-                lst[i + self.size // 2] = self.find_skilled_prof(i)
-        super().__init__(lst)
+                self[i + self.size // 2] = self.find_skilled_prof(i)
         self.hard_constraints_violated()
         self.soft_constraints_violated()
 
@@ -110,7 +110,7 @@ class Chromosome(list):
                         self.get_gene_class(i) != self.get_gene_class(i + int(self.size / 2)):
                     self.num_of_soft_conflicts += 1
                 if self[i] == -1 and self[i + self.size // 2] == -1:
-                    self.num_of_soft_conflicts += 5
+                    self.num_of_soft_conflicts += 10
         for x in tt:
             self.num_of_soft_conflicts += (len(tt[x]) - len(set(tt[x])))
         for x in pc:
