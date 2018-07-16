@@ -8,7 +8,7 @@ free_class_dir = './files/FreeClass/'
 free_time_dir = './files/ProfFreeTime/'
 skill_dir = './files/SKILL/'
 
-skill_filenum, free_time_filenum, free_class_filenum, capacity_filenum, register_filenum, prof_num = 8, 0, 0, 2, 1, 10
+skill_filenum, free_time_filenum, free_class_filenum, capacity_filenum, register_filenum, prof_num = 0, 0, 0, 2, 1, 10
 
 skill_file = pd.read_excel(skill_dir + 'profskill' + str(skill_filenum) + '_profnumber-' + str(prof_num)
                            + '.xlsx', sheet_name=None)

@@ -77,7 +77,7 @@ def main():
         p_c = 0.8
         print(iteration, population[0].num_of_hard_conflicts, population[0].num_of_soft_conflicts,
               population[0].compute_fitness_value())
-        if population.is_mundane():
+        if population.is_mundane() or iteration == 1000:
             break
         children = crossover(population, p_c)
         mutation(children, p_r)

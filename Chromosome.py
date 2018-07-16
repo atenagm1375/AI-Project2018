@@ -105,14 +105,14 @@ class Chromosome(list):
                         self.get_gene_class(i) != self.get_gene_class(i + int(self.size / 2)):
                     self.num_of_soft_conflicts += 1
                 if self[i] == -1 and self[i + self.size // 2] == -1:
-                    self.num_of_soft_conflicts += 1
+                    self.num_of_soft_conflicts += 10
         for x in tt:
             self.num_of_soft_conflicts += (len(tt[x]) - len(set(tt[x])))
         for x in pc:
             self.num_of_soft_conflicts += (np.max(pc[x]) - np.min(pc[x]))
 
     def compute_fitness_value(self):
-        return np.log(self.num_of_hard_conflicts * 10 + self.num_of_soft_conflicts)
+        return np.arctan(self.num_of_hard_conflicts * 10 + self.num_of_soft_conflicts)
 
     def mutate_chrm(self, r_m):
         mutated = False
@@ -122,4 +122,7 @@ class Chromosome(list):
                     continue
                 self[r] = self.find_skilled_prof(r if r < self.size / 2 else r - self.size // 2)
                 mutated = True
+        if random.uniform(0, 1) <= 0.5:
+            rnd = random.randint(0, self.size // 2 - 1)
+            self[rnd] = self[rnd + self.size // 2] = -1
         return mutated
