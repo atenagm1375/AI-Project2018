@@ -37,7 +37,7 @@ class Chromosome(list):
                     lst.append(i * timeslots_num + j)
         if len(lst) <= 1:
             return -1
-        return lst[random.randint(0, len(lst) - 1)]
+        return lst[random.randint(0, len(lst) - 1)] if random.uniform(0, 1) <= 0.75 else -1
 
     def get_gene_prof(self, nth):
         gene = self[nth]

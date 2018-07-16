@@ -2,6 +2,7 @@ import math
 import random
 from copy import deepcopy
 
+from generate_output import generate_output
 from Chromosome import Chromosome, timeslots_num, course_value, courses_list
 from Population import Population
 
@@ -74,13 +75,15 @@ def main():
         population.sort(key=Chromosome.compute_fitness_value)
         p_r = 0.05
         p_c = 0.8
-        print(iteration, population[0].num_of_hard_conflicts, population[0].num_of_soft_conflicts, population[0].compute_fitness_value())
+        print(iteration, population[0].num_of_hard_conflicts, population[0].num_of_soft_conflicts,
+              population[0].compute_fitness_value())
         if population.is_mundane():
             break
         children = crossover(population, p_c)
         mutation(children, p_r)
         children.fit()
         population = children
+    generate_output(population[0])
 
 
 main()

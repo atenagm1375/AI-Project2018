@@ -53,6 +53,9 @@ del skill_sheet1
 
 prof_time = {i: np.ravel(free_time_file[i]) for i in profs_list}
 
+days = list(free_time_file[profs_list[0]].index)
+times = list(free_time_file[profs_list[0]].columns)
+
 timeslots_num = len(np.ravel(free_time_file[profs_list[0]]))
 
 classes_list = list(free_class_file.keys())
