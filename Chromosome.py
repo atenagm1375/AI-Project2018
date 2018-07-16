@@ -3,14 +3,6 @@ import random
 from file_decode import *
 
 
-
-    # cls = random.sample(classes_list, 1)[0]
-    # s = prof + '-' + str(cls)
-    # index = list(classprof_time.keys()).index(s)
-    # time = random.randint(0, timeslots_num - 1)
-    # return index * timeslots_num + time
-
-
 class Chromosome(list):
     gene_values = np.ravel([list(classprof_time[i]) for i in classprof_time])
     gene_range = range(-1, len(gene_values))
@@ -27,12 +19,15 @@ class Chromosome(list):
                 continue
             self[i] = self.find_skilled_prof(i)
             if course_value[courses_list[i]] > 2:
-                self[i + self.size // 2] = self.find_skilled_prof(i)
+                self[i + self.size // 2] = self.find_time_for_prof(self.get_gene_prof(i))
         self.hard_constraints_violated()
         self.soft_constraints_violated()
 
     def find_skilled_prof(self, nth):
         prof = random.sample(course_prof[courses_list[nth]], 1)[0]
+        return self.find_time_for_prof(prof)
+
+    def find_time_for_prof(self, prof):
         indexes = [i for i in range(len(classprof_time.keys())) if list(
             classprof_time.keys())[i].split('-')[0] == prof]
         lst = []
@@ -40,9 +35,9 @@ class Chromosome(list):
             for j in range(timeslots_num):
                 if self.gene_values[i * timeslots_num + j] == 1:
                     lst.append(i * timeslots_num + j)
-        if not lst:
+        if len(lst) <= 1:
             return -1
-        return random.choice(lst)
+        return lst[random.randint(0, len(lst) - 1)]
 
     def get_gene_prof(self, nth):
         gene = self[nth]
@@ -86,7 +81,7 @@ class Chromosome(list):
                     courses_list[i if i < self.size / 2 else i - self.size // 2]]:
                 self.num_of_hard_conflicts += 1
             if self[i] != -1 and courses_list[i if i < self.size / 2 else i - self.size // 2] in \
-                    registers_more_than_20 and self.get_gene_class(i) not in capacity_more_than_20:
+                    registers_more_than_20 and int(self.get_gene_class(i)) not in capacity_more_than_20:
                 self.num_of_hard_conflicts += 1
             if self[i] != -1 and not self.is_gene_time_valid(i):
                 self.num_of_hard_conflicts += 1
@@ -118,25 +113,11 @@ class Chromosome(list):
 
     def compute_fitness_value(self):
         return np.log(self.num_of_hard_conflicts * 10 + self.num_of_soft_conflicts)
-        # return 2 - ((1 / (1 + np.sqrt(self.num_of_hard_conflicts))) + (1 / (1 + np.square(self.num_of_soft_conflicts))))
-        # return 1 - (1 / (1 + np.sqrt(self.num_of_hard_conflicts) + np.arctan(self.num_of_soft_conflicts)))
 
     def mutate_chrm(self, r_m):
         mutated = False
         for r in range(self.size):
             if random.uniform(0, 1) <= r_m:
-                # rnd2 = random.randint(0, self.size - 1)
-                # ll = list(classprof_time.keys())
-                # t1 = self[r] % timeslots_num
-                # t2 = self[rnd2] % timeslots_num
-                # prof1 = ll[self[r] // timeslots_num].split('-')[0]
-                # prof2 = ll[self[rnd2] // timeslots_num].split('-')[0]
-                # class1 = ll[self[r] // timeslots_num].split('-')[1]
-                # class2 = ll[self[rnd2] // timeslots_num].split('-')[1]
-                # pc1 = prof1 + '-' + class2
-                # pc2 = prof2 + '-' + class1
-                # self[r] = ll.index(pc1) * timeslots_num + t2
-                # self[rnd2] = ll.index(pc2) * timeslots_num + t1
                 if not course_prof[courses_list[r if r < self.size / 2 else r - self.size // 2]]:
                     continue
                 self[r] = self.find_skilled_prof(r if r < self.size / 2 else r - self.size // 2)

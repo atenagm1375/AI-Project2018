@@ -2,7 +2,7 @@ import math
 import random
 from copy import deepcopy
 
-from Chromosome import Chromosome, timeslots_num
+from Chromosome import Chromosome, timeslots_num, course_value, courses_list
 from Population import Population
 
 
@@ -23,16 +23,15 @@ def tournament_selection(pop, size=3):
 def crossover(pop, prob, swap=0.5):
     # print('crossover')
     children = Population()
-    for x in range(number_of_population // 2):
+    for x in range(number_of_population):
         parent1 = tournament_selection(pop)
         parent2 = tournament_selection(pop)
         child1 = deepcopy(parent1)
-        child2 = deepcopy(parent2)
         if random.uniform(0, 1) <= prob:
             for i in range(child1.size):
                 if random.uniform(0, 1) >= swap:
-                    if child1[i] != child2[i]:
-                        child1[i], child2[i] = child2[i], child1[i]
+                    if child1[i] != parent2[i]:
+                        child1[i] = parent2[i]
                     elif child1[i] != -1:
                         while True:
                             t1 = random.randint(0, timeslots_num - 1)
@@ -40,16 +39,23 @@ def crossover(pop, prob, swap=0.5):
                             if t1 != t2:
                                 break
                             child1[i] = child1[i] // timeslots_num + t1
-                            child2[i] = child2[i] // timeslots_num + t2
         children.append(child1)
-        children.append(child2)
-    children.fit()
     return children
 
 
 def mutation(pop, prob, rate=0.25):
     # print('mutation')
     for p in pop:
+        for i in range(p.size // 2):
+            if course_value[courses_list[i]] > 2:
+                if p[i] == -1 ^ p[i + p.size // 2] == -1:
+                    p[i] = p[i + p.size // 2] = -1
+                elif p.get_gene_prof(i) != p.get_gene_prof(i + p.size // 2):
+                    if random.uniform(0, 1) < 0.5:
+                        p[i + p.size // 2] = p.find_time_for_prof(p.get_gene_prof(i))
+                    else:
+                        p[i] = p.find_time_for_prof(p.get_gene_prof(i + p.size // 2))
+
         if random.uniform(0, 1) <= prob:
             p.mutate_chrm(rate)
 
@@ -57,6 +63,7 @@ def mutation(pop, prob, rate=0.25):
 def main():
     global number_of_population
     number_of_population = 100
+    print('initializing population...')
     population = Population(number_of_population)
     # best = []
 
@@ -67,12 +74,12 @@ def main():
         population.sort(key=Chromosome.compute_fitness_value)
         p_r = 0.05
         p_c = 0.8
-        print(iteration, population[0].num_of_hard_conflicts, population[0].num_of_soft_conflicts, len(population))
+        print(iteration, population[0].num_of_hard_conflicts, population[0].num_of_soft_conflicts, population[0].compute_fitness_value())
         if population.is_mundane():
             break
-        # selected_population = selection(population)
         children = crossover(population, p_c)
         mutation(children, p_r)
+        children.fit()
         population = children
 
 
