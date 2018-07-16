@@ -19,10 +19,10 @@ def generate_output(ans):
             data = courses_list[i].split('-')[0] + '-' + cls
             df[prof].iat[day_time % len(days), day_time // len(days)] = data
         if gene2 != -1:
-            prof = ans.get_gene_prof(i - ans.size // 2)
-            cls = ans.get_gene_class(i - ans.size // 2)
+            prof = ans.get_gene_prof(i + ans.size // 2)
+            cls = ans.get_gene_class(i + ans.size // 2)
             day_time = gene1 % timeslots_num
-            data = courses_list[i - ans.size // 2].split('-')[0] + '-' + cls
+            data = courses_list[i].split('-')[0] + '-' + cls
             df[prof].iat[day_time % len(days), day_time // len(days)] = data
 
     for p in profs_list:

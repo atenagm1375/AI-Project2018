@@ -105,7 +105,7 @@ class Chromosome(list):
                         self.get_gene_class(i) != self.get_gene_class(i + int(self.size / 2)):
                     self.num_of_soft_conflicts += 1
                 if self[i] == -1 and self[i + self.size // 2] == -1:
-                    self.num_of_soft_conflicts += 10
+                    self.num_of_soft_conflicts += 1
         for x in tt:
             self.num_of_soft_conflicts += (len(tt[x]) - len(set(tt[x])))
         for x in pc:
