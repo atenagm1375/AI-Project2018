@@ -5,10 +5,13 @@ from Chromosome import Chromosome
 
 
 class Population(list):
-    def __init__(self, length=0):
+    def __init__(self, length=0, remove=False):
         super().__init__()
-        for i in range(length):
-            self.append(Chromosome())
+        if remove:
+            self.append(Chromosome(remove))
+        else:
+            for i in range(length):
+                self.append(Chromosome())
 
     def fit(self):
         for p in self:

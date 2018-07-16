@@ -78,7 +78,11 @@ def main():
         print(iteration, population[0].num_of_hard_conflicts, population[0].num_of_soft_conflicts,
               population[0].compute_fitness_value())
         if population.is_mundane() or iteration == 1000:
-            break
+            if population[0].num_of_hard_conflicts == 0:
+                break
+            else:
+                print('hello')
+                population[-1] = Chromosome(remove=True)
         children = crossover(population, p_c)
         mutation(children, p_r)
         children.fit()

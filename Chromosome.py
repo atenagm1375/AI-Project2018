@@ -7,21 +7,22 @@ class Chromosome(list):
     gene_values = np.ravel([list(classprof_time[i]) for i in classprof_time])
     gene_range = range(-1, len(gene_values))
 
-    def __init__(self):
+    def __init__(self, remove=False):
         self.size = 2 * len(courses_list)
         self.prof_num_of_courses = {p: 0 for p in profs_list}
         self.num_of_hard_conflicts = 0
-        self.num_of_soft_conflicts = 0
+        self.num_of_soft_conflicts = 10 * self.size
         lst = [-1] * self.size
         super().__init__(lst)
-        for i in range(len(courses_list)):
-            if not course_prof[courses_list[i]]:
-                continue
-            self[i] = self.find_skilled_prof(i)
-            if course_value[courses_list[i]] > 2:
-                self[i + self.size // 2] = self.find_time_for_prof(self.get_gene_prof(i))
-        self.hard_constraints_violated()
-        self.soft_constraints_violated()
+        if not remove:
+            for i in range(len(courses_list)):
+                if not course_prof[courses_list[i]]:
+                    continue
+                self[i] = self.find_skilled_prof(i)
+                if course_value[courses_list[i]] > 2:
+                    self[i + self.size // 2] = self.find_time_for_prof(self.get_gene_prof(i))
+            self.hard_constraints_violated()
+            self.soft_constraints_violated()
 
     def find_skilled_prof(self, nth):
         prof = random.sample(course_prof[courses_list[nth]], 1)[0]
@@ -122,7 +123,4 @@ class Chromosome(list):
                     continue
                 self[r] = self.find_skilled_prof(r if r < self.size / 2 else r - self.size // 2)
                 mutated = True
-        if random.uniform(0, 1) <= 0.5:
-            rnd = random.randint(0, self.size // 2 - 1)
-            self[rnd] = self[rnd + self.size // 2] = -1
         return mutated
