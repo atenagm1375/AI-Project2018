@@ -11,7 +11,8 @@ class Chromosome(list):
         self.size = 2 * len(courses_list)
         self.prof_num_of_courses = {p: 0 for p in profs_list}
         self.num_of_hard_conflicts = 0
-        self.num_of_soft_conflicts = 10 * self.size
+        self.penalty = 10
+        self.num_of_soft_conflicts = self.penalty * self.size
         lst = [-1] * self.size
         super().__init__(lst)
         if not remove:
@@ -29,13 +30,9 @@ class Chromosome(list):
         return self.find_time_for_prof(prof)
 
     def find_time_for_prof(self, prof):
-        indexes = [i for i in range(len(classprof_time.keys())) if list(
-            classprof_time.keys())[i].split('-')[0] == prof]
-        lst = []
-        for i in indexes:
-            for j in range(timeslots_num):
-                if self.gene_values[i * timeslots_num + j] == 1:
-                    lst.append(i * timeslots_num + j)
+        if prof is None:
+            return -1
+        lst = prof_free_time_class[prof]
         if len(lst) <= 1:
             return -1
         return lst[random.randint(0, len(lst) - 1)]
@@ -106,7 +103,7 @@ class Chromosome(list):
                         self.get_gene_class(i) != self.get_gene_class(i + int(self.size / 2)):
                     self.num_of_soft_conflicts += 1
                 if self[i] == -1 and self[i + self.size // 2] == -1:
-                    self.num_of_soft_conflicts += 10
+                    self.num_of_soft_conflicts += self.penalty
         for x in tt:
             self.num_of_soft_conflicts += (len(tt[x]) - len(set(tt[x])))
         for x in pc:
@@ -121,6 +118,9 @@ class Chromosome(list):
             if random.uniform(0, 1) <= r_m:
                 if not course_prof[courses_list[r if r < self.size / 2 else r - self.size // 2]]:
                     continue
-                self[r] = self.find_skilled_prof(r if r < self.size / 2 else r - self.size // 2)
+                if random.uniform(0, 1) <= 0.9:
+                    self[r] = self.find_skilled_prof(r if r < self.size / 2 else r - self.size // 2)
+                elif r < self.size // 2:
+                    self[r] = self[r + self.size // 2] = -1
                 mutated = True
         return mutated

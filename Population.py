@@ -13,6 +13,10 @@ class Population(list):
             for i in range(length):
                 self.append(Chromosome())
 
+    def set_penalty(self, val):
+        for p in self:
+            p.penalty = val
+
     def fit(self):
         for p in self:
             p.hard_constraints_violated()

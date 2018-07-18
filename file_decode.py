@@ -8,7 +8,7 @@ free_class_dir = './files/FreeClass/'
 free_time_dir = './files/ProfFreeTime/'
 skill_dir = './files/SKILL/'
 
-skill_filenum, free_time_filenum, free_class_filenum, capacity_filenum, register_filenum, prof_num = 8, 8, 0, 2, 1, 10
+skill_filenum, free_time_filenum, free_class_filenum, capacity_filenum, register_filenum, prof_num = 0, 0, 0, 2, 1, 10
 
 skill_file = pd.read_excel(skill_dir + 'profskill' + str(skill_filenum) + '_profnumber-' + str(prof_num)
                            + '.xlsx', sheet_name=None)
@@ -91,3 +91,10 @@ registers_more_than_20 = [registers_sheet1[registers_sheet1.keys()[0]][i] for i 
 
 del asked_class_file
 del registers_sheet1
+
+prof_free_time_class = {p: [] for p in profs_list}
+bin_values = np.ravel([list(classprof_time[i]) for i in classprof_time])
+for i in range(len(classprof_time.keys())):
+    for j in range(timeslots_num):
+        if bin_values[i * timeslots_num + j] == 1:
+            prof_free_time_class[list(classprof_time.keys())[i].split('-')[0]].append(i * timeslots_num + j)
