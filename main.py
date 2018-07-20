@@ -71,8 +71,8 @@ def main():
     population = Population(number_of_population)
     generation_number = 1000
 
-    p_r = 0.05
-    p_c = 0.7
+    p_r = 0.1
+    p_c = 0.75
     iteration = 0
     while True:
         number_of_population = len(population)
@@ -81,19 +81,16 @@ def main():
         print(iteration, population[0].num_of_hard_conflicts, population[0].num_of_soft_conflicts,
               population[0].compute_fitness_value(), population[0].penalty)
         if population.is_mundane() or iteration == generation_number:
-            if population[0].num_of_hard_conflicts == 0:
-                break
-            else:
-                print('hello')
-                population[-1] = Chromosome(remove=True)
-                iteration = 0
-                population.set_penalty(8)
-                generation_number = 100
-                p_r += 0.005
+            break
         children = crossover(population, p_c)
         mutation(children, p_r)
         children.fit()
         population = children
+
+    for i in population[0].conflicting_genes:
+        population[0][i] = -1
+    population.fit()
+    print(population[0].num_of_hard_conflicts, population[0].num_of_soft_conflicts, population[0].penalty)
     generate_output(population[0])
 
 
