@@ -94,12 +94,12 @@ class Chromosome(list):
                 self.conflicting_genes.append(i)
                 self.num_of_hard_conflicts += 1
         for x in pt:
-            self.num_of_hard_conflicts += 3 * (len(pt[x]) - len(set(pt[x])))
+            self.num_of_hard_conflicts += (len(pt[x]) - len(set(pt[x])))
             for item, count in collections.Counter(pt[x]).items():
                 if count > 1:
                     self.conflicting_genes.append(item)
         for x in ct:
-            self.num_of_hard_conflicts += 3 * (len(ct[x]) - len(set(ct[x])))
+            self.num_of_hard_conflicts += (len(ct[x]) - len(set(ct[x])))
             for item, count in collections.Counter(ct[x]).items():
                 if count > 1:
                     self.conflicting_genes.append(item)
@@ -121,14 +121,14 @@ class Chromosome(list):
                         self.get_gene_class(i) != self.get_gene_class(i + int(self.size / 2)):
                     self.num_of_soft_conflicts += 1
                 if self[i] == -1 and self[i + self.size // 2] == -1:
-                    self.num_of_soft_conflicts += 10
+                    # self.num_of_soft_conflicts += 8
                     self.penalty += 1
         for x in tt:
             self.num_of_soft_conflicts += (len(tt[x]) - len(set(tt[x])))
-        self.num_of_soft_conflicts += (np.max(list(pc.values())) - np.min(list(pc.values())))
+        self.num_of_soft_conflicts += np.var(list(pc.values()))
 
     def compute_fitness_value(self):
-        return np.arctan(self.num_of_hard_conflicts * 10 + self.num_of_soft_conflicts)
+        return np.arctan(10 * self.num_of_hard_conflicts + self.num_of_soft_conflicts + 5 * self.penalty)
 
     def mutate_chrm(self, r_m):
         mutated = False
@@ -136,9 +136,9 @@ class Chromosome(list):
             if random.uniform(0, 1) <= r_m:
                 if not course_prof[courses_list[r if r < self.size / 2 else r - self.size // 2]]:
                     continue
-                if random.uniform(0, 1) <= 0.7:
-                    self[r] = self.find_skilled_prof(r if r < self.size / 2 else r - self.size // 2)
-                elif r < self.size // 2:
-                    self[r] = self[r + self.size // 2] = -1
+                # if random.uniform(0, 1) <= 0.7:
+                self[r] = self.find_skilled_prof(r if r < self.size / 2 else r - self.size // 2)
+                # elif r < self.size // 2:
+                #     self[r] = self[r + self.size // 2] = -1
                 mutated = True
         return mutated

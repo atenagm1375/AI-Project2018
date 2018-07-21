@@ -1,5 +1,6 @@
 import math
 import random
+import time
 from copy import deepcopy
 
 from generate_output import generate_output
@@ -71,17 +72,44 @@ def main():
     population = Population(number_of_population)
     generation_number = 1000
 
-    p_r = 0.1
+    p_r = 0.05
     p_c = 0.75
     iteration = 0
+    best_fit = math.inf
+    best_cnt = 0
+    cnt_limit = 5
+
     while True:
         number_of_population = len(population)
         iteration += 1
+        best_cnt += 1
         population.sort(key=Chromosome.compute_fitness_value)
         print(iteration, population[0].num_of_hard_conflicts, population[0].num_of_soft_conflicts,
               population[0].compute_fitness_value(), population[0].penalty)
+        if population[0].num_of_hard_conflicts != 0:
+            if best_fit > population[0].compute_fitness_value():
+                best_fit = population[0].compute_fitness_value()
+                best_cnt = 0
+                cnt_limit += 5
+            elif best_cnt == cnt_limit:
+                i = 0
+                while population[0][i] == -1 or i >= population[0].size // 2:
+                    i += 1
+                for p in population:
+                    p[i] = p[i + p.size // 2] = -1
+                best_cnt = 0
+                cnt_limit = 100
         if population.is_mundane() or iteration == generation_number:
-            break
+            if population[0].num_of_hard_conflicts == 0:
+                break
+            else:
+                i = 0
+                while population[0][i] == -1 and i < population[0].size // 2:
+                    i += 1
+                for p in population:
+                    p[i] = p[i + p.size // 2] = -1
+                iteration = 0
+                generation_number = 500
         children = crossover(population, p_c)
         mutation(children, p_r)
         children.fit()
@@ -94,4 +122,6 @@ def main():
     generate_output(population[0])
 
 
+start_time = time.time()
 main()
+print(time.time() - start_time)
