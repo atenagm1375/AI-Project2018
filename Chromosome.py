@@ -96,13 +96,15 @@ class Chromosome(list):
         for x in pt:
             self.num_of_hard_conflicts += (len(pt[x]) - len(set(pt[x])))
             for item, count in collections.Counter(pt[x]).items():
-                if count > 1:
+                while count > 1:
                     self.conflicting_genes.append(item)
+                    count -= 1
         for x in ct:
             self.num_of_hard_conflicts += (len(ct[x]) - len(set(ct[x])))
             for item, count in collections.Counter(ct[x]).items():
-                if count > 1:
+                while count > 1:
                     self.conflicting_genes.append(item)
+                    count -= 1
 
     def soft_constraints_violated(self):
         self.num_of_soft_conflicts = 0
