@@ -10,8 +10,10 @@ class Population(list):
         if remove:
             self.append(Chromosome(remove))
         else:
-            for i in range(length):
-                self.append(Chromosome())
+            if length > 0:
+                self.append(Chromosome(True))
+                for i in range(length - 1):
+                    self.append(Chromosome())
 
     def set_penalty(self, val):
         for p in self:

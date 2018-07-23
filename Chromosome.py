@@ -1,4 +1,4 @@
-import collections
+# import collections
 import random
 
 from file_decode import *
@@ -15,7 +15,7 @@ class Chromosome(list):
         self.penalty = self.size
         self.num_of_soft_conflicts = 10 * self.size
         lst = [-1] * self.size
-        self.conflicting_genes = []
+        # self.conflicting_genes = []
         super().__init__(lst)
         if not remove:
             for i in range(len(courses_list)):
@@ -61,7 +61,7 @@ class Chromosome(list):
 
     def hard_constraints_violated(self):
         self.num_of_hard_conflicts = 0
-        self.conflicting_genes = []
+        # self.conflicting_genes = []
         pt = {p: [] for p in profs_list}
         ct = {c: [] for c in classes_list}
         for i in range(self.size):
@@ -71,40 +71,40 @@ class Chromosome(list):
             if i < self.size / 2:
                 if course_value[courses_list[i]] <= 2 and self[i + self.size // 2] != -1 and self[i] != -1:
                     self.num_of_hard_conflicts += 1
-                    self.conflicting_genes.append(i)
+                    # self.conflicting_genes.append(i)
                 if course_value[courses_list[i]] > 2 and (self[i + self.size // 2] == -1 ^ self[i] == -1):
                     self.num_of_soft_conflicts += 1
-                    self.conflicting_genes.append(i)
+                    # self.conflicting_genes.append(i)
                 if self[i + self.size // 2] != -1 and self[i] != -1:
                     if self.get_gene_prof(i) != self.get_gene_prof(i + int(self.size / 2)):
-                        self.conflicting_genes.append(i)
+                        # self.conflicting_genes.append(i)
                         self.num_of_hard_conflicts += 1
                     if self[i] % timeslots_num == self[i + self.size // 2] % timeslots_num:
-                        self.conflicting_genes.append(i)
+                        # self.conflicting_genes.append(i)
                         self.num_of_hard_conflicts += 1
             if self[i] != -1 and self.get_gene_prof(i) not in course_prof[
                     courses_list[i if i < self.size / 2 else i - self.size // 2]]:
-                self.conflicting_genes.append(i)
+                # self.conflicting_genes.append(i)
                 self.num_of_hard_conflicts += 1
             if self[i] != -1 and courses_list[i if i < self.size / 2 else i - self.size // 2] in \
                     registers_more_than_20 and int(self.get_gene_class(i)) not in capacity_more_than_20:
-                self.conflicting_genes.append(i)
+                # self.conflicting_genes.append(i)
                 self.num_of_hard_conflicts += 1
             if self[i] != -1 and not self.is_gene_time_valid(i):
-                self.conflicting_genes.append(i)
+                # self.conflicting_genes.append(i)
                 self.num_of_hard_conflicts += 1
         for x in pt:
             self.num_of_hard_conflicts += (len(pt[x]) - len(set(pt[x])))
-            for item, count in collections.Counter(pt[x]).items():
-                while count > 1:
-                    self.conflicting_genes.append(item)
-                    count -= 1
+            # for item, count in collections.Counter(pt[x]).items():
+            #     while count > 1:
+            #         self.conflicting_genes.append(item)
+            #         count -= 1
         for x in ct:
             self.num_of_hard_conflicts += (len(ct[x]) - len(set(ct[x])))
-            for item, count in collections.Counter(ct[x]).items():
-                while count > 1:
-                    self.conflicting_genes.append(item)
-                    count -= 1
+            # for item, count in collections.Counter(ct[x]).items():
+            #     while count > 1:
+            #         self.conflicting_genes.append(item)
+            #         count -= 1
 
     def soft_constraints_violated(self):
         self.num_of_soft_conflicts = 0
@@ -130,7 +130,7 @@ class Chromosome(list):
         self.num_of_soft_conflicts += np.var(list(pc.values()))
 
     def compute_fitness_value(self):
-        return np.arctan(10 * self.num_of_hard_conflicts + self.num_of_soft_conflicts + 5 * self.penalty)
+        return np.arctan(10 * self.num_of_hard_conflicts + self.num_of_soft_conflicts + 10 * self.penalty)
 
     def mutate_chrm(self, r_m):
         mutated = False

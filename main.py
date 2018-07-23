@@ -70,55 +70,66 @@ def main():
     number_of_population = 150
     print('initializing population...')
     population = Population(number_of_population)
+    population.sort(key=Chromosome.compute_fitness_value)
+    first_pen = population[0].penalty
     generation_number = 1000
 
-    p_r = 0.05
-    p_c = 0.75
     iteration = 0
     best_fit = math.inf
     best_cnt = 0
-    cnt_limit = 5
+    cnt_limit = 100
 
     while True:
+        p_r = 0.05
+        p_c = 0.75
         number_of_population = len(population)
         iteration += 1
         best_cnt += 1
         population.sort(key=Chromosome.compute_fitness_value)
         print(iteration, population[0].num_of_hard_conflicts, population[0].num_of_soft_conflicts,
-              population[0].compute_fitness_value(), population[0].penalty)
-        if population[0].num_of_hard_conflicts != 0:
+              population[0].compute_fitness_value(), population[0].penalty, len(population))
+        if population[0].num_of_hard_conflicts != 0 or population[0].penalty != first_pen:
             if best_fit > population[0].compute_fitness_value():
                 best_fit = population[0].compute_fitness_value()
                 best_cnt = 0
-                cnt_limit += 5
+                # cnt_limit += 5
             elif best_cnt == cnt_limit:
-                i = 0
-                while population[0][i] == -1 or i >= population[0].size // 2:
-                    i += 1
-                for p in population:
-                    p[i] = p[i + p.size // 2] = -1
+                # i = 0
+                # while population[0][i] == -1 or i >= population[0].size // 2:
+                #     i += 1
+                # population[0][i] = population[0][i + population[0].size // 2 if i < population[0].size / 2 else
+                #                                  i - population[0].size // 2] = -1
+                # for p in population:
+                #     p[i] = p[i + p.size // 2] = -1
+                # population[-1] = Chromosome(True)
+                # population.fit()
+                # population.sort(key=Chromosome.compute_fitness_value)
                 best_cnt = 0
                 cnt_limit = 100
+                p_r = 0.3
         if population.is_mundane() or iteration == generation_number:
-            if population[0].num_of_hard_conflicts == 0:
+            if population[0].num_of_hard_conflicts == 0 or population[0].penalty == first_pen:
                 break
             else:
-                i = 0
-                while population[0][i] == -1 and i < population[0].size // 2:
-                    i += 1
-                for p in population:
-                    p[i] = p[i + p.size // 2] = -1
-                iteration = 0
-                generation_number = 500
+                # i = 0
+                # while population[0][i] == -1 and i < population[0].size // 2:
+                #     i += 1
+                # for p in population:
+                #     p[i] = p[i + p.size // 2] = -1
+                # iteration = 0
+                generation_number += 200
+                p_r = 0.3
+                if generation_number >= 2000:
+                    break
         children = crossover(population, p_c)
         mutation(children, p_r)
         children.fit()
         population = children
 
-    for i in population[0].conflicting_genes:
-        population[0][i] = -1
-    population.fit()
-    print(population[0].num_of_hard_conflicts, population[0].num_of_soft_conflicts, population[0].penalty)
+    # for i in population[0].conflicting_genes:
+    #     population[0][i] = -1
+    # population.fit()
+    # print(population[0].num_of_hard_conflicts, population[0].num_of_soft_conflicts, population[0].penalty)
     generate_output(population[0])
 
 
